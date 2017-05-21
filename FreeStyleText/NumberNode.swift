@@ -27,20 +27,8 @@ class NumberNode : NSObject, NSCoding{
         self.row = row
         self.number = number
         texture = SKTexture(imageNamed: "Node_Bg_" + String(self.number))
-    }
-    
-//    override var hashValue: Int {
-//        return column^row
-//    }
-//    
-//    override var hash: Int{
-//        return column^row
-//    }
-//    
-//   // static func == (lhs: NumberNode, rhs : NumberNode) -> Bool {
-//     //   return lhs.column == rhs.column && lhs.row == rhs.row && lhs.number == rhs.number
-//    //}
-    
+    }    
+   
     required convenience init?(coder aDecoder: NSCoder) {
         let column = Int(aDecoder.decodeInt32(forKey: "column"))
         let row = Int(aDecoder.decodeInt32(forKey: "row"))

@@ -13,8 +13,8 @@ class GameScene: SKScene {
     
     let padding : CGFloat = 14.4
     let tileWidth : CGFloat = 72
-    var radioWidth : CGFloat! = 1
-    var radioHeight : CGFloat! = 1
+    
+    var continueGameWhen2048 = false
     
     var score = 0 {
         didSet{
@@ -27,6 +27,7 @@ class GameScene: SKScene {
     var newGame = true
     var boardGame = BoardGame()
     var swipeAbleFlag = true
+    
     var highestNodeNumber = 8 {
         didSet{
             let imageName = "Node_Bg_\(highestNodeNumber)"
@@ -46,6 +47,10 @@ class GameScene: SKScene {
     var scoreText : SKLabelNode!
     let bestScoreText = SKLabelNode(text: "0")
     let highestNode = SKSpriteNode(imageNamed: "Node_Bg_8")
+    var continueButton : SKSpriteNode?
+    var newGameButton : SKSpriteNode?
+    var continueSceneNode : SKSpriteNode?
+    
     
     init(size: CGSize, newGame : Bool) {
         super.init(size: size)
@@ -135,31 +140,53 @@ class GameScene: SKScene {
     
     // func detect Swipe
     func swipeAction(gesture : UISwipeGestureRecognizer){
+        var (array, score) : ([[NumberNode]], Int) = ([[]], 0)
         if swipeAbleFlag {
             switch gesture.direction {
             case UISwipeGestureRecognizerDirection.left :
                 print("left")
-                let (array,score) = boardGame.swipeBoard(moveDirection: .right)
-                animateMoveNode(array: array,score: score)
+                (array,score) = boardGame.swipeBoard(moveDirection: .left)
             case UISwipeGestureRecognizerDirection.right :
                 print("right")
-                let (array,score) = boardGame.swipeBoard(moveDirection: .left)
-                animateMoveNode(array: array,score: score)
+                (array,score) = boardGame.swipeBoard(moveDirection: .right)
             case UISwipeGestureRecognizerDirection.up :
                 print("up")
-                let (array,score) = boardGame.swipeBoard(moveDirection: .up)
-                animateMoveNode(array: array,score: score)
+                (array,score) = boardGame.swipeBoard(moveDirection: .up)
+              //  animateMoveNode(array: array,score: score)
             case UISwipeGestureRecognizerDirection.down :
                 print("down")
-                let (array,score) = boardGame.swipeBoard(moveDirection: .down)
-                animateMoveNode(array: array,score: score)
+                (array,score) = boardGame.swipeBoard(moveDirection: .down)
             default :
                 print("default")
             }
             
-        }
-        
+            animateMoveNode(array: array,score: score) {
+                self.swipeAbleFlag = true
+                self.removeAllActions()
+                if !self.boardGame.isFull() {
+                    if self.boardGame.is2048 {
+                        if self.continueGameWhen2048 {
+                            if !array.isEmpty {
+                                let newNode = self.boardGame.randomNumberNode()
+                                self.animateNewNode(node: newNode!)
+                            }
+                        }else {
+                            self.continueScene()
+                        }
+                        
+                    }else {
+                        if !array.isEmpty {
+                            let newNode = self.boardGame.randomNumberNode()
+                            self.animateNewNode(node: newNode!)
+                        }
+                    }
+                }
+               
+                self.score += score
+            }
+        }        
     }
+    
     
     //setup background 
     func setupBackground(){
@@ -188,12 +215,10 @@ class GameScene: SKScene {
     
     //setup highest Node
     func setupHighestNode (){
-        let viewSize = view?.bounds.size
         highestNode.size = CGSize(width: 108, height: 108)
         highestNode.zPosition = 0
         let width = -bg.size.width / 2 + 54
-        highestNode.position = CGPoint(x:width , y: viewSize!.height/2 - 100 * radioHeight)
-        //print(viewSize!.height / 2 )
+        highestNode.position = CGPoint(x:width , y: bg.size.height/2 + 60 )
         addChild(highestNode)
     }
     
@@ -229,7 +254,7 @@ class GameScene: SKScene {
         return position
     }
     
-    func animateNewNode(node : NumberNode){        
+    func animateNewNode(node : NumberNode){
         let position = pointAt(column: node.column, row: node.row)
         let size = node.texture.size()
         let skNode = SKSpriteNode(texture: node.texture, size: node.texture.size())
@@ -241,18 +266,21 @@ class GameScene: SKScene {
         addChild(skNode)
         skNode.run(skAction){
             self.swipeAbleFlag = true
-            if !self.boardGame.canMove(node: node) {
+            // check node moi hien ra va ko move duoc xung quanh, va node day bang thi se het game
+            if !self.boardGame.canMove() && self.boardGame.isFull() {
                 print("End game")
-                let scene = EndGameScene(size: self.size, isWin: false)
+                let scene = EndGameScene(size: self.size, isWin: self.continueGameWhen2048, highestNodeNumber : self.highestNodeNumber)
                 let reveal = SKTransition.doorsCloseVertical(withDuration: 1.0)
                 self.view?.presentScene(scene, transition: reveal)
             } else {
                 print("Continue game")
+                
             }
         }
     }
     
-    func animateMoveNode(array : [[NumberNode]],score : Int){
+    //animate when we swipe screen
+    func animateMoveNode(array : [[NumberNode]],score : Int, completion : @escaping (() -> ())){
         swipeAbleFlag = false
         let delay : CGFloat = 0
         var duration = TimeInterval(0)
@@ -305,17 +333,57 @@ class GameScene: SKScene {
                 }
             }
         }
+        run(SKAction.wait(forDuration: duration), completion : completion)
+    }
+    
+    // setup continue sceen when player get 2048
+    func continueScene(){
+        continueSceneNode = SKSpriteNode(imageNamed: "Continue_Bg")
+        continueSceneNode?.zPosition = 5
+        continueSceneNode?.position = CGPoint(x: 0, y: 0)
+        addChild(continueSceneNode!)
         
-        run(SKAction.wait(forDuration: duration)){
-            if !self.boardGame.isFull() {
-                if !array.isEmpty {
-                    let newNode = self.boardGame.randomNumberNode()
-                    self.animateNewNode(node: newNode!)
-                }
+        //setup Continue game 
+        continueButton = SKSpriteNode(imageNamed: "ContinueButton")
+        continueButton?.zPosition = 1
+        continueButton?.position = CGPoint(x: 0, y: -((continueSceneNode?.size.height)! / 6))
+        continueSceneNode?.addChild(continueButton!)
+        
+        //setup New game
+        newGameButton = SKSpriteNode(imageNamed: "NewGameButton")
+        newGameButton?.zPosition = 1
+        newGameButton?.position = CGPoint(x: 0 , y: -(continueButton!.size.height * 2 + 20))
+        continueSceneNode?.addChild(newGameButton!)
+        
+        //setup 2048 node
+        let node2048 = SKSpriteNode(imageNamed: "Node_Bg_2048")
+        node2048.zPosition = 1
+        node2048.position = CGPoint(x: 0, y: node2048.size.height)
+        continueSceneNode?.addChild(node2048)
+        
+        let size2048 = node2048.size
+        let scaleBigger = SKAction.scale(to: CGSize(width : size2048.width * 2, height : size2048.height * 2), duration: 1)
+        let scaleSmaller = SKAction.scale(to: CGSize(width: size2048.width / 2, height: size2048.height / 2), duration: 1)
+        node2048.run(SKAction.repeatForever(SKAction.sequence([scaleBigger,scaleSmaller])))
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
+        let touchLocation = touch?.location(in: self)
+        
+        if let continueButton = continueButton {
+            if continueButton.contains(touchLocation!) {
+                continueSceneNode?.removeFromParent()
+                self.continueGameWhen2048 = true
             }
-            self.swipeAbleFlag = true
-            self.removeAllActions()
-            self.score += score
+        }
+        
+        if let newGameButton = newGameButton{
+            if newGameButton.contains(touchLocation!) {
+                let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
+                let gameScene = GameScene(size: self.size, newGame: true)
+                view?.presentScene(gameScene, transition: reveal)
+            }
         }
     }
 }

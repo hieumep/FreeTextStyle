@@ -25,8 +25,8 @@ class GameViewController: UIViewController {
         // including entities and graphs.
         let size = CGSize(width: 414, height: 736)
        
-        let scene = MenuScene(size: size)
-        //let scene = EndGameScene(size: size, isWin: true)
+        //let scene = MenuScene(size: size)
+        let scene = EndGameScene(size: size, isWin: true, highestNodeNumber : 4096)
         let skView = view as! SKView!
         scene.scaleMode = .aspectFill
         skView?.presentScene(scene)

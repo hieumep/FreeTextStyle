@@ -22,7 +22,7 @@ class BoardGame : NSObject{
     var highestNode = 8
     var gameState : GameState?
     var loadGame = false
-    
+    var is2048 = false
     
     override init(){
         super.init()
@@ -66,8 +66,22 @@ class BoardGame : NSObject{
         return true
     }
     
+    //check all node can move 
+    func canMove() -> Bool{
+        for column in 0 ..< 4 {
+            for row in 0 ..< 4 {
+                if let node = gameArray[column, row] {
+                    if canNodeMove(node: node) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
     //func check Node can move 
-    func canMove(node : NumberNode) -> Bool{
+    func canNodeMove(node : NumberNode) -> Bool{
         let column = node.column
         let row = node.row
         var countCanMove = 0
@@ -133,8 +147,8 @@ class BoardGame : NSObject{
     func swipeBoard(moveDirection : moveDirection) -> ([[NumberNode]],sumScore :Int){
         var rows = [[NumberNode]]()
         var sumScore = 0
-        //when swipe is right
-        if moveDirection == .right {
+        //when swipe is left
+        if moveDirection == .left {
             for column in 0 ..< 4 {
                 var array = [NumberNode]()
                 var mixFlag = false
@@ -190,8 +204,8 @@ class BoardGame : NSObject{
         }
         
         
-        //when swipe is left
-        if moveDirection == .left {
+        //when swipe is right
+        if moveDirection == .right {
             for column in 0 ..< 4 {
                 var array = [NumberNode]()
                 var mixFlag = false
@@ -302,7 +316,7 @@ class BoardGame : NSObject{
             }
         }
         
-        // when swipe is down 
+        // when swipe is down
         if moveDirection == .down {
             for row in 0 ..< 4 {
                 var array = [NumberNode]()
@@ -368,6 +382,9 @@ class BoardGame : NSObject{
             node.newColumn = mixIntoNode.column
             node.number = 0
             mixIntoNode.number = mixIntoNode.number * 2
+            if mixIntoNode.number == 2048 {
+                is2048 = true
+            }
             highestNode = max(highestNode, mixIntoNode.number * 2)
             node.mix = true
             return node

@@ -34,16 +34,8 @@ class GameState : NSObject, NSCoding {
         
     }
     
-    func encode(with aCoder: NSCoder) {
-        
-        //aCoder.encode(gameArray as Any, forKey: "gameArray")
+    func encode(with aCoder: NSCoder) {    
         let arrayNumberNode = convertGameArrayToArray(gameArray: gameArray)
-//        if arrayNumberNode.count > 1 {
-//            aCoder.encode(arrayNumberNode.count, forKey: "arrayCount")
-//            for idx in 0 ..< arrayNumberNode.count - 1 {
-//                aCoder.encode(arrayNumberNode[idx] as AnyObject)
-//            }
-//        }
         aCoder.encode(arrayNumberNode, forKey: "arrayNodes")
         aCoder.encode(score, forKey: "score")
         aCoder.encode(highestNode, forKey: "highestNode")
