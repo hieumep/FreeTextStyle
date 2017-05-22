@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5120CFE91ED2B77900B915E6 /* GameVsAiScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5120CFE81ED2B77900B915E6 /* GameVsAiScene.swift */; };
 		513158351EC590FE000F0FBF /* BoardGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513158341EC590FE000F0FBF /* BoardGame.swift */; };
 		513158371EC59132000F0FBF /* Array2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513158361EC59132000F0FBF /* Array2D.swift */; };
 		513158391EC6E1CC000F0FBF /* myUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513158381EC6E1CC000F0FBF /* myUtils.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5120CFE81ED2B77900B915E6 /* GameVsAiScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameVsAiScene.swift; sourceTree = "<group>"; };
 		513158341EC590FE000F0FBF /* BoardGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoardGame.swift; sourceTree = "<group>"; };
 		513158361EC59132000F0FBF /* Array2D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array2D.swift; sourceTree = "<group>"; };
 		513158381EC6E1CC000F0FBF /* myUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = myUtils.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 				517A430E1ECD386600C10749 /* GameState.swift */,
 				517A43101ECD780F00C10749 /* MenuScene.swift */,
 				517A43121ECF8B4E00C10749 /* EndGameScene.swift */,
+				5120CFE81ED2B77900B915E6 /* GameVsAiScene.swift */,
 			);
 			path = FreeStyleText;
 			sourceTree = "<group>";
@@ -166,6 +169,7 @@
 				51F61F7E1EC1928100C0E9B3 /* GameViewController.swift in Sources */,
 				517A43111ECD780F00C10749 /* MenuScene.swift in Sources */,
 				517A43131ECF8B4E00C10749 /* EndGameScene.swift in Sources */,
+				5120CFE91ED2B77900B915E6 /* GameVsAiScene.swift in Sources */,
 				513158351EC590FE000F0FBF /* BoardGame.swift in Sources */,
 				51F61FC61EC5245100C0E9B3 /* NumberNode.swift in Sources */,
 				517A430F1ECD386600C10749 /* GameState.swift in Sources */,

@@ -1,15 +1,16 @@
 //
-//  GameScene.swift
+//  GameVsAiScene.swift
 //  FreeStyleText
 //
-//  Created by Hieu Vo on 5/8/17.
+//  Created by Hieu Vo on 5/21/17.
 //  Copyright © 2017 Hieu Vo. All rights reserved.
 //
 
+import Foundation
 import SpriteKit
-import GameplayKit
 
-class GameScene: SKScene {
+class GameVsAiScene : SKScene {
+    
     
     let padding : CGFloat = 14.4
     let tileWidth : CGFloat = 72
@@ -64,7 +65,7 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-       
+        
         //self.backgroundColor = SKColor.white
         setupBackground()
         setupNumberNodes()
@@ -112,7 +113,7 @@ class GameScene: SKScene {
         }
         //  boardGame.printArray()
     }
-
+    
     //load begin game with 2 node random
     func beginGame() {
         for _ in 0 ..< 2 {
@@ -122,7 +123,7 @@ class GameScene: SKScene {
             }
         }
     }
-
+    
     //setup swipe Gesture {
     func setupSwipeGesture(){
         let swipeGestureLeft = UISwipeGestureRecognizer(target: self, action: #selector(self.swipeAction(gesture:)))
@@ -153,7 +154,7 @@ class GameScene: SKScene {
             case UISwipeGestureRecognizerDirection.up :
                 print("up")
                 (array,score) = boardGame.swipeBoard(moveDirection: .up)
-              //  animateMoveNode(array: array,score: score)
+            //  animateMoveNode(array: array,score: score)
             case UISwipeGestureRecognizerDirection.down :
                 print("down")
                 (array,score) = boardGame.swipeBoard(moveDirection: .down)
@@ -182,21 +183,21 @@ class GameScene: SKScene {
                         }
                     }
                 }
-               
+                
                 self.score += score
             }
-        }        
+        }
     }
     
     
-    //setup background 
+    //setup background
     func setupBackground(){
         let bgTexture = SKTexture(image: #imageLiteral(resourceName: "Background"))
         bg = SKSpriteNode(texture: bgTexture, color: .white, size: bgTexture.size())
         bg.position = CGPoint(x: 0, y: -60)
         bg.zPosition = -2
         addChild(bg)
-    
+        
     }
     
     //setup cac node nen
@@ -218,31 +219,34 @@ class GameScene: SKScene {
     func setupHighestNode (){
         highestNode.size = CGSize(width: 108, height: 108)
         highestNode.zPosition = 0
-        let width = -bg.size.width / 2 + 54
-        highestNode.position = CGPoint(x:width , y: bg.size.height/2 + 60 )
+       // let width = -bg.size.width / 2 + 54
+        highestNode.position = CGPoint(x:0 , y: bg.size.height/2 + 60 )
         addChild(highestNode)
         
-        menuButton = SKSpriteNode(imageNamed: "MenuButton")
-        menuButton?.zPosition = 3
-        menuButton?.position = CGPoint(x: -width + 16, y: highestNode.position.y)
-        addChild(menuButton!)
+//        menuButton = SKSpriteNode(imageNamed: "MenuButton")
+//        menuButton?.zPosition = 3
+//        menuButton?.position = CGPoint(x: -width + 16, y: highestNode.position.y)
+//        addChild(menuButton!)
     }
     
     //setup scoreBoard
     func setupScoreBoard(){
+        
+        
+        let width = -bg.size.width / 2 + 54
         let score_bg = SKSpriteNode(imageNamed: "Score_Bg")
-        score_bg.position = CGPoint(x: -score_bg.size.width/2 + 30, y: highestNode.position.y + 29)
+        score_bg.position = CGPoint(x: width, y: bg.size.height/2 + 32)
         addChild(score_bg)
         scoreText = SKLabelNode(text: "\(score)")
         scoreText.zPosition = 3
         scoreText.fontName = "Arial"
-        scoreText.fontSize = 25       
+        scoreText.fontSize = 25
         scoreText.horizontalAlignmentMode = .center
         scoreText.verticalAlignmentMode = .center
         score_bg.addChild(scoreText)
         
         let bestScore_Bg = SKSpriteNode(imageNamed: "bestScore_Bg")
-        bestScore_Bg.position = CGPoint(x: score_bg.position.x, y: score_bg.position.y - bestScore_Bg.size.height - 8)
+        bestScore_Bg.position = CGPoint(x: -width, y: bg.size.height/2 + 32)
         addChild(bestScore_Bg)
         bestScoreText.zPosition = 3
         bestScoreText.fontName = "Arial"
@@ -290,7 +294,7 @@ class GameScene: SKScene {
         swipeAbleFlag = false
         let delay : CGFloat = 0
         var duration = TimeInterval(0)
-        var distance = 0        
+        var distance = 0
         for subArray in array {
             for (_, node) in subArray.enumerated() {
                 
@@ -301,7 +305,7 @@ class GameScene: SKScene {
                 }else {
                     distance = abs(node.newColumn - node.column)
                 }
-               // print("distance is \(distance)")
+                // print("distance is \(distance)")
                 duration = TimeInterval(delay + CGFloat(distance) * 0.15)
                 if node.mix {
                     let moveAction = SKAction.move(to: newPosition, duration: duration)
@@ -349,7 +353,7 @@ class GameScene: SKScene {
         continueSceneNode?.position = CGPoint(x: 0, y: 0)
         addChild(continueSceneNode!)
         
-        //setup Continue game 
+        //setup Continue game
         continueButton = SKSpriteNode(imageNamed: "ContinueButton")
         continueButton?.zPosition = 1
         continueButton?.position = CGPoint(x: 0, y: -((continueSceneNode?.size.height)! / 6))
@@ -401,3 +405,4 @@ class GameScene: SKScene {
         }
     }
 }
+

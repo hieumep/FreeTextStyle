@@ -11,6 +11,7 @@ import SpriteKit
 
 class MenuScene : SKScene {
     var continueButton : SKSpriteNode?
+    var gameVsAIButton : SKSpriteNode?
     var newButton : SKSpriteNode!
     var paddingY : CGFloat = 150
     
@@ -18,6 +19,7 @@ class MenuScene : SKScene {
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         setupNewButton()
         setupContinueButton()
+        setupGameVsAIButton()
     }
     
     //setup newButton 
@@ -39,21 +41,34 @@ class MenuScene : SKScene {
         
     }
     
+    func setupGameVsAIButton(){
+        gameVsAIButton = SKSpriteNode(imageNamed: "GameVsAIButton")
+        gameVsAIButton?.zPosition = 1
+        gameVsAIButton?.position = CGPoint(x: 0, y: -paddingY / 3 + gameVsAIButton!.size.height / 2 )
+        addChild(gameVsAIButton!)
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
         let touchLocation = touch?.location(in: self)
-        
+        let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
         if newButton.contains(touchLocation!){
-            let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
             let gameScene = GameScene(size: self.size, newGame: true)
             view?.presentScene(gameScene, transition: reveal)
             
         }
+        
         if let continueButton = continueButton {
             if continueButton.contains(touchLocation!){
-                let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
                 let gameScene = GameScene(size: self.size, newGame: false)
                 view?.presentScene(gameScene, transition: reveal)
+            }
+        }
+        
+        if let gameVsAIButton = gameVsAIButton {
+            if gameVsAIButton.contains(touchLocation!) {
+                let gameVsAiScene = GameVsAiScene(size: self.size, newGame: true)
+                view?.presentScene(gameVsAiScene, transition: reveal)
             }
         }
     }
