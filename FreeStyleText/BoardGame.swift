@@ -14,6 +14,7 @@ enum moveDirection {
 
 import Foundation
 import SpriteKit
+import GameplayKit
 
 class BoardGame : NSObject{
     var gameArray = Array2D<NumberNode>(columns : 4, rows :4)
@@ -27,9 +28,9 @@ class BoardGame : NSObject{
     override init(){
         super.init()
         setupBoardWithZeroNode()
-    } 
+    }
     
-    // save game State 
+    // save game State
     func saveGameState() {
         if let gameState = gameState {
             gameState.gameArray = gameArray
@@ -401,4 +402,108 @@ class BoardGame : NSObject{
             print()
         }
     }
+    
+    func processAI() -> moveDirection {
+        var arrayDirection = [moveDirection]()
+        var direction = moveDirection.left
+        let copyBoard = BoardGame()
+        let secondCopyBoard = BoardGame()
+        var maxScore = 0
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        //letf
+        let (_ , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
+        copyArray(array: copyBoard.gameArray, arrayCopy: secondCopyBoard.gameArray)
+        var playerScore = secondCopyBoard.findBestScore()
+        var diffScore = scoreLeft - playerScore
+        if diffScore > maxScore {
+            direction = .left
+            maxScore = diffScore
+        }else if diffScore == maxScore {
+            arrayDirection.append(.left)
+        }
+        
+        //right
+        let (_, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
+        copyArray(array: copyBoard.gameArray, arrayCopy: secondCopyBoard.gameArray)
+        playerScore = secondCopyBoard.findBestScore()
+        diffScore = scoreRight - playerScore
+        if diffScore > maxScore {
+            direction = .right
+            maxScore = diffScore
+            arrayDirection.removeAll()
+        }else if diffScore == maxScore{
+            arrayDirection.append(.right)
+        }
+        
+        //up
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
+        copyArray(array: copyBoard.gameArray, arrayCopy: secondCopyBoard.gameArray)
+        playerScore = secondCopyBoard.findBestScore()
+        diffScore = scoreUp - playerScore
+        if diffScore > maxScore {
+            direction = .up
+            maxScore = diffScore
+            arrayDirection.removeAll()
+        }else if diffScore == maxScore {
+            arrayDirection.append(.up)
+        }
+        
+        //down
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
+        copyArray(array: copyBoard.gameArray, arrayCopy: secondCopyBoard.gameArray)
+        playerScore = secondCopyBoard.findBestScore()
+        diffScore = scoreDown - playerScore
+        if diffScore > maxScore {
+            direction = .down
+            maxScore = diffScore
+            arrayDirection.removeAll()
+        } else if scoreDown == diffScore {
+            arrayDirection.append(.down)
+        }
+        if !arrayDirection.isEmpty {
+            let randomIndex = Int(arc4random_uniform(UInt32(arrayDirection.count - 1)))
+            return arrayDirection[randomIndex]
+        }
+        return direction
+        
+    }
+    
+    // Ham dung de copy value cua mang
+    func copyArray(array : Array2D<NumberNode>, arrayCopy : Array2D<NumberNode>){
+        for column in 0 ..< array.columns {
+            for row in 0 ..< array.rows {
+                arrayCopy[column,row]?.number = (array[column, row]?.number)!
+            }
+        }
+    }
+
+    func findBestScore() -> Int{
+        var maxScore = 0
+        let copyBoard = BoardGame()
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_ , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
+        if scoreLeft >= maxScore {
+            maxScore = scoreLeft
+        }
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
+        if scoreRight >= maxScore {
+            maxScore = scoreRight
+        }
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
+        if scoreUp >= maxScore {
+            maxScore = scoreUp
+        }
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
+        if scoreDown >= maxScore {
+            maxScore = scoreDown
+        }
+        return maxScore
+    }
+    
 }
+

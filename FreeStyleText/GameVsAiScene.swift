@@ -17,9 +17,9 @@ class GameVsAiScene : SKScene {
     
     var continueGameWhen2048 = false
     
-    var score = 0 {
+    var playerScore = 0 {
         didSet{
-            scoreText.text = "\(score)"
+            playerScoreText.text = "\(playerScore)"
         }
     }
     
@@ -29,32 +29,39 @@ class GameVsAiScene : SKScene {
     var boardGame = BoardGame()
     var swipeAbleFlag = true
     
-    var highestNodeNumber = 8 {
+    var AIScore = 0 {
         didSet{
-            let imageName = "Node_Bg_\(highestNodeNumber)"
-            let texture = SKTexture(imageNamed: imageName)
-            highestNode.texture = texture
-            print(highestNodeNumber)
+            AIScoreText.text = "\(AIScore)"
+            //UserDefaults.standard.set(bestScore, forKey: "bestScore")
         }
     }
     
-    var bestScore = 0 {
-        didSet{
-            bestScoreText.text = "\(bestScore)"
-            UserDefaults.standard.set(bestScore, forKey: "bestScore")
-        }
-    }
-    
-    var scoreText : SKLabelNode!
-    let bestScoreText = SKLabelNode(text: "0")
+    let playerScoreText = SKLabelNode(text: "0")
+    let AIScoreText = SKLabelNode(text: "0")
     let highestNode = SKSpriteNode(imageNamed: "Node_Bg_8")
     var continueButton : SKSpriteNode?
     var newGameButton : SKSpriteNode?
     var continueSceneNode : SKSpriteNode?
     var menuButton : SKSpriteNode?
-    
+    var playerTextureBg = SKTexture(image: #imageLiteral(resourceName: "Player_Bg_Select"))
+    var AITextureBg = SKTexture(image: #imageLiteral(resourceName: "AI_Bg"))
+    var playerFlag = true {
+        didSet {
+            if playerFlag {
+                playerTextureBg = SKTexture(image: #imageLiteral(resourceName: "Player_Bg_Select"))
+                AITextureBg = SKTexture(image: #imageLiteral(resourceName: "AI_Bg"))
+            }else {
+                playerTextureBg = SKTexture(image: #imageLiteral(resourceName: "Player_Bg"))
+                AITextureBg = SKTexture(image: #imageLiteral(resourceName: "AI_Bg_Select"))
+            }
+        }
+    }
+    var playerBg : SKSpriteNode!
+    var AIBg : SKSpriteNode!
     
     init(size: CGSize, newGame : Bool) {
+        playerBg = SKSpriteNode(texture: playerTextureBg)
+        AIBg = SKSpriteNode(texture: AITextureBg)
         super.init(size: size)
         self.newGame = newGame
     }
@@ -72,21 +79,17 @@ class GameVsAiScene : SKScene {
         setupSwipeGesture()
         setupHighestNode()
         setupScoreBoard()
-        if let bestScore = UserDefaults.standard.object(forKey: "bestScore") as? Int {
-            boardGame.bestScore = bestScore
-        }
-        bestScore = boardGame.bestScore
         if newGame {
             beginGame()
         }else {
-            if let gameState = loadGameState(){
-                boardGame.loadGame = true
-                boardGame.score = gameState.score
-                boardGame.highestNode = gameState.highestNode
-                score = gameState.score
-                highestNodeNumber = gameState.highestNode
-                loadPauseGame(gameState.gameArray)
-            }
+//            if let gameState = loadGameState(){
+//                boardGame.loadGame = true
+//                boardGame.score = gameState.score
+//                boardGame.highestNode = gameState.highestNode
+//                score = gameState.score
+//                highestNodeNumber = gameState.highestNode
+//                loadPauseGame(gameState.gameArray)
+//            }
         }
     }
     
@@ -161,30 +164,8 @@ class GameVsAiScene : SKScene {
             default :
                 print("default")
             }
-            
-            animateMoveNode(array: array,score: score) {
-                self.swipeAbleFlag = true
-                self.removeAllActions()
-                if !self.boardGame.isFull() {
-                    if self.boardGame.is2048 {
-                        if self.continueGameWhen2048 {
-                            if !array.isEmpty {
-                                let newNode = self.boardGame.randomNumberNode()
-                                self.animateNewNode(node: newNode!)
-                            }
-                        }else {
-                            self.continueScene()
-                        }
-                        
-                    }else {
-                        if !array.isEmpty {
-                            let newNode = self.boardGame.randomNumberNode()
-                            self.animateNewNode(node: newNode!)
-                        }
-                    }
-                }
-                
-                self.score += score
+            if !array.isEmpty {
+                animateMoveNode(array: array,score: score)
             }
         }
     }
@@ -217,43 +198,50 @@ class GameVsAiScene : SKScene {
     
     //setup highest Node
     func setupHighestNode (){
-        highestNode.size = CGSize(width: 108, height: 108)
-        highestNode.zPosition = 0
+       // highestNode.size = CGSize(width: 108, height: 108)
+        //highestNode.zPosition = 0
        // let width = -bg.size.width / 2 + 54
-        highestNode.position = CGPoint(x:0 , y: bg.size.height/2 + 60 )
-        addChild(highestNode)
+       // highestNode.position = CGPoint(x:0 , y: bg.size.height/2 + 60 )
+       // addChild(highestNode)
         
-//        menuButton = SKSpriteNode(imageNamed: "MenuButton")
-//        menuButton?.zPosition = 3
-//        menuButton?.position = CGPoint(x: -width + 16, y: highestNode.position.y)
-//        addChild(menuButton!)
+        menuButton = SKSpriteNode(imageNamed: "MenuButton")
+        menuButton?.zPosition = 3
+        menuButton?.position = CGPoint(x: 0, y: bg.size.height/2 + 60)
+        addChild(menuButton!)
     }
     
     //setup scoreBoard
     func setupScoreBoard(){
-        
-        
         let width = -bg.size.width / 2 + 54
+        // setup Player Side
+        playerBg.zPosition = 3
+        playerBg.position = CGPoint(x: width, y: menuButton!.position.y + 29)
+        addChild(playerBg)        
         let score_bg = SKSpriteNode(imageNamed: "Score_Bg")
         score_bg.position = CGPoint(x: width, y: bg.size.height/2 + 32)
         addChild(score_bg)
-        scoreText = SKLabelNode(text: "\(score)")
-        scoreText.zPosition = 3
-        scoreText.fontName = "Arial"
-        scoreText.fontSize = 25
-        scoreText.horizontalAlignmentMode = .center
-        scoreText.verticalAlignmentMode = .center
-        score_bg.addChild(scoreText)
+        playerScoreText.zPosition = 3
+        playerScoreText.fontName = "Arial"
+        playerScoreText.fontSize = 25
+        playerScoreText.horizontalAlignmentMode = .center
+        playerScoreText.verticalAlignmentMode = .center
+        score_bg.addChild(playerScoreText)
         
+        
+        //setup AI Side
+       // AIBg = SKSpriteNode(texture: AITextureBg)
+        AIBg.zPosition = 3
+        AIBg.position = CGPoint(x: -width, y: menuButton!.position.y + 29)
+        addChild(AIBg)
         let bestScore_Bg = SKSpriteNode(imageNamed: "bestScore_Bg")
         bestScore_Bg.position = CGPoint(x: -width, y: bg.size.height/2 + 32)
         addChild(bestScore_Bg)
-        bestScoreText.zPosition = 3
-        bestScoreText.fontName = "Arial"
-        bestScoreText.fontSize = 25
-        bestScoreText.verticalAlignmentMode = .center
-        bestScoreText.horizontalAlignmentMode = .center
-        bestScore_Bg.addChild(bestScoreText)
+        AIScoreText.zPosition = 3
+        AIScoreText.fontName = "Arial"
+        AIScoreText.fontSize = 25
+        AIScoreText.verticalAlignmentMode = .center
+        AIScoreText.horizontalAlignmentMode = .center
+        bestScore_Bg.addChild(AIScoreText)
     }
     
     // Convert Int to CGPoint
@@ -274,23 +262,28 @@ class GameVsAiScene : SKScene {
         skNode.zPosition = 1
         arrayNodes[node.column,node.row] = skNode
         addChild(skNode)
-        skNode.run(skAction){
+        skNode.run(SKAction.sequence([skAction, SKAction.wait(forDuration: 0.25)])){
+            
             self.swipeAbleFlag = true
             // check node moi hien ra va ko move duoc xung quanh, va node day bang thi se het game
             if !self.boardGame.canMove() && self.boardGame.isFull() {
                 print("End game")
-                let scene = EndGameScene(size: self.size, isWin: self.continueGameWhen2048, highestNodeNumber : self.highestNodeNumber)
-                let reveal = SKTransition.doorsCloseVertical(withDuration: 1.0)
-                self.view?.presentScene(scene, transition: reveal)
+//                let scene = EndGameScene(size: self.size, isWin: self.continueGameWhen2048, highestNodeNumber : self.highestNodeNumber)
+//                let reveal = SKTransition.doorsCloseVertical(withDuration: 1.0)
+//                self.view?.presentScene(scene, transition: reveal)
             } else {
                 print("Continue game")
-                
+                if !self.playerFlag {
+                    let AIDirection = self.boardGame.processAI()
+                    let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
+                    self.animateMoveNode(array: AIarray, score: AIscore)
+                }
             }
         }
     }
     
     //animate when we swipe screen
-    func animateMoveNode(array : [[NumberNode]],score : Int, completion : @escaping (() -> ())){
+    func animateMoveNode(array : [[NumberNode]],score : Int){
         swipeAbleFlag = false
         let delay : CGFloat = 0
         var duration = TimeInterval(0)
@@ -324,17 +317,6 @@ class GameVsAiScene : SKScene {
                     let ZoomOut = SKAction.scale(to: CGSize(width: size.width * 1.2, height: size.height * 1.2), duration: 0.1)
                     let ZoomIn = SKAction.scale(to: size, duration: 0.1)
                     nextNode?.run(SKAction.sequence([SKAction.wait(forDuration: duration), animateTexture, ZoomOut,ZoomIn])){
-                        if self.boardGame.highestNode > self.highestNodeNumber {
-                            //change highest Node Number
-                            let imageName = "Node_Bg_\(self.boardGame.highestNode)"
-                            let texture = SKTexture(imageNamed: imageName)
-                            self.highestNode.run(SKAction.animate(with: [texture], timePerFrame: 0.3, resize: false, restore: false)){
-                                self.highestNodeNumber = self.boardGame.highestNode
-                            }
-                        }
-                        if self.boardGame.bestScore > self.bestScore {
-                            self.bestScore = self.boardGame.bestScore
-                        }
                     }
                 }else {
                     skNode!.run(SKAction.move(to: newPosition, duration: duration ))
@@ -343,7 +325,40 @@ class GameVsAiScene : SKScene {
                 }
             }
         }
-        run(SKAction.wait(forDuration: duration), completion : completion)
+        run(SKAction.wait(forDuration: duration + 0.5)){
+            self.swipeAbleFlag = true
+            self.removeAllActions()
+            if self.playerFlag {
+                self.playerScore += score
+            } else {
+                self.AIScore += score
+            }
+            self.playerFlag = !self.playerFlag
+            self.playerBg.texture = self.playerTextureBg
+            self.AIBg.texture = self.AITextureBg
+            if !self.boardGame.isFull() {
+                if self.boardGame.is2048 {
+                    if self.continueGameWhen2048 {
+                        if !array.isEmpty {
+                            let newNode = self.boardGame.randomNumberNode()
+                            self.animateNewNode(node: newNode!)
+                        }
+                    }else {
+                        self.continueScene()
+                    }
+                    
+                }else {
+                    if !array.isEmpty {
+                        let newNode = self.boardGame.randomNumberNode()
+                        self.animateNewNode(node: newNode!)
+                    }
+                }
+            }
+            
+            //self.run(SKAction.wait(forDuration: 0.5)){
+                
+            //}
+        }
     }
     
     // setup continue sceen when player get 2048
@@ -401,6 +416,53 @@ class GameVsAiScene : SKScene {
                 let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
                 let menuScene = MenuScene(size: self.size)
                 view?.presentScene(menuScene, transition: reveal)
+            }
+        }
+    }
+    
+    func animateScore(node : SKSpriteNode){
+        let size = node.size
+        let scaleBigger = SKAction.scale(to: CGSize(width: size.width * 1.5, height: size.height * 1.5), duration: 0.3)
+        let scaleSmaller = SKAction.scale(to: size, duration: 0.3)
+        node.run(SKAction.sequence([scaleBigger,scaleSmaller]))
+    }
+    
+    func processAI() -> moveDirection {
+        var direction = moveDirection.left
+        let copyBoard = BoardGame()
+        var maxScore = 0
+        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
+        let (_ , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
+        if scoreLeft >= maxScore {
+            direction = .left
+            maxScore = scoreLeft
+        }
+        let (_, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
+        if scoreRight >= maxScore {
+            direction = .right
+            maxScore = scoreRight
+        }
+        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
+        if scoreUp >= maxScore {
+            direction = .up
+            maxScore = scoreUp
+        }
+        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
+        let (_, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
+        if scoreDown >= maxScore {
+            direction = .down
+            maxScore = scoreDown
+        }
+        return direction
+
+    }
+    
+    // Ham dung de copy value cua mang
+    func copyArray(array : Array2D<NumberNode>, arrayCopy : Array2D<NumberNode>){
+        for column in 0 ..< array.columns {
+            for row in 0 ..< array.rows {
+                arrayCopy[column,row]?.number = (array[column, row]?.number)!
             }
         }
     }

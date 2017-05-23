@@ -229,7 +229,7 @@ class GameScene: SKScene {
     }
     
     //setup scoreBoard
-    func setupScoreBoard(){
+    func setupScoreBoard(){        
         let score_bg = SKSpriteNode(imageNamed: "Score_Bg")
         score_bg.position = CGPoint(x: -score_bg.size.width/2 + 30, y: highestNode.position.y + 29)
         addChild(score_bg)
