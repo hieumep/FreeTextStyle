@@ -274,9 +274,16 @@ class GameVsAiScene : SKScene {
             } else {
                 print("Continue game")
                 if !self.playerFlag {
-                    let AIDirection = self.boardGame.processAI()
-                    let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
-                    self.animateMoveNode(array: AIarray, score: AIscore)
+                    if let AIDirection = self.boardGame.processAI(){
+                        let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
+                        if !AIarray.isEmpty{
+                            self.animateMoveNode(array: AIarray, score: AIscore)
+                        }else {
+                            print("khong co nuoc di")
+                        }
+                    } else {
+                        print("no move")
+                    }
                 }
             }
         }

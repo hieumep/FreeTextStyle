@@ -27,7 +27,8 @@ class GameViewController: UIViewController {
        
         //let scene = MenuScene(size: size)
         //let scene = EndGameScene(size: size, isWin: true, highestNodeNumber : 4096)
-        let scene = GameVsAiScene(size: size, newGame: true)
+        let scene = EndGameAIScene(size: size, playerScore: 2, AIScore: 1)
+        //let scene = GameVsAiScene(size: size, newGame: true)
         let skView = view as! SKView!
         scene.scaleMode = .aspectFill
         skView?.presentScene(scene)
