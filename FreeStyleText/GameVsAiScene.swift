@@ -219,6 +219,7 @@ class GameVsAiScene : SKScene {
         addChild(playerBg)        
         let score_bg = SKSpriteNode(imageNamed: "Score_Bg")
         score_bg.position = CGPoint(x: width, y: bg.size.height/2 + 32)
+        print("player : x : \(score_bg.position.x) va y : \(score_bg.position.y)")
         addChild(score_bg)
         playerScoreText.zPosition = 3
         playerScoreText.fontName = "Arial"
@@ -235,6 +236,7 @@ class GameVsAiScene : SKScene {
         addChild(AIBg)
         let bestScore_Bg = SKSpriteNode(imageNamed: "bestScore_Bg")
         bestScore_Bg.position = CGPoint(x: -width, y: bg.size.height/2 + 32)
+        print("AI : x : \(bestScore_Bg.position.x) va y : \(bestScore_Bg.position.y)")
         addChild(bestScore_Bg)
         AIScoreText.zPosition = 3
         AIScoreText.fontName = "Arial"
@@ -268,9 +270,9 @@ class GameVsAiScene : SKScene {
             // check node moi hien ra va ko move duoc xung quanh, va node day bang thi se het game
             if !self.boardGame.canMove() && self.boardGame.isFull() {
                 print("End game")
-//                let scene = EndGameScene(size: self.size, isWin: self.continueGameWhen2048, highestNodeNumber : self.highestNodeNumber)
-//                let reveal = SKTransition.doorsCloseVertical(withDuration: 1.0)
-//                self.view?.presentScene(scene, transition: reveal)
+                let scene = EndGameAIScene(size: self.size, playerScore: self.playerScore, AIScore: self.AIScore)
+                let reveal = SKTransition.doorsCloseVertical(withDuration: 1.0)
+                self.view?.presentScene(scene, transition: reveal)
             } else {
                 print("Continue game")
                 if !self.playerFlag {

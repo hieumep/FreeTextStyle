@@ -12,13 +12,16 @@ import SpriteKit
 class EndGameAIScene : SKScene {
     
     let winText = "You Win! I'll win next time "
-    let loseText =  "You lose! Can you beat me next time?"
+    let loseText =  "You lose!Can you beat me next time?"
     var winLabel = SKLabelNode()
     var loseLabel = SKLabelNode()
     var playerScore : Int
     var AIScore : Int
     var newButton : SKSpriteNode!
-    
+    let playerScoreLabel = SKLabelNode(text: "0")
+    let AIScoreLabel = SKLabelNode(text: "0")
+    let playerNode = SKSpriteNode(imageNamed: "Score_Bg")
+    let AINode = SKSpriteNode(imageNamed: "bestScore_Bg")
     
     init(size: CGSize, playerScore : Int, AIScore : Int) {
         self.AIScore = AIScore
@@ -50,38 +53,52 @@ class EndGameAIScene : SKScene {
     func animateWin(){
         winLabel.fontName = "Arial" // tim font moi
         winLabel.fontSize = 25
-        winLabel.position = CGPoint(x: 0, y: 150)
+        winLabel.position = CGPoint(x: 0, y: 250)
         addChild(winLabel)
         
-        let numberNode = SKSpriteNode(imageNamed: "bestScore_Bg")
-        numberNode.position = CGPoint(x: 0, y: 0)
-        addChild(numberNode)
-        
-        let label = SKLabelNode(text: "\(playerScore)")
-        label.horizontalAlignmentMode = .center
-        label.verticalAlignmentMode = .center
-        label.fontName = "Arial"
-        label.fontSize = 25
-        numberNode.addChild(label)
-        let size = numberNode.size
-       // numberNode.size = CGSize(width: size.width * 0.2, height: size.height * 0.2)
+        let size = playerNode.size
         let bigSize = CGSize(width: size.width * 2, height: size.height * 1.5)
-        let move = SKAction.move(to: CGPoint(x: 50, y: 50), duration: 2.0)
-        numberNode.run(SKAction.group([move, SKAction.scale(to: bigSize, duration: 2.0)]))
+        let move = SKAction.move(to: CGPoint(x: 0, y: 0), duration: 2.0)
+        playerNode.run(SKAction.group([move, SKAction.scale(to: bigSize, duration: 2.0)]))
     }
     
     func animateLose(){
         loseLabel.fontName = "Arial" // tim font moi
         loseLabel.fontSize = 25
-        loseLabel.position = CGPoint(x: 0, y: 150)
+        loseLabel.position = CGPoint(x: 0, y: 250)
         addChild(loseLabel)
+        
+        let size = AINode.size
+        let bigSize = CGSize(width: size.width * 2, height: size.height * 1.5)
+        let move = SKAction.move(to: CGPoint(x: 0, y: 0), duration: 2.0)
+        AINode.run(SKAction.group([move, SKAction.scale(to: bigSize, duration: 2.0)]))
     }
     
     func setupNewButton() {
-        newButton = SKSpriteNode(imageNamed: "NewGameButton")
+        newButton = SKSpriteNode(imageNamed: "Menu_horz")
         newButton.zPosition = 1
         newButton.position = CGPoint(x: 0 , y: -(150 + newButton.size.height / 2))
         addChild(newButton)
+        
+        playerNode.position = CGPoint(x: -127.5, y: 180)
+        addChild(playerNode)
+        
+        playerScoreLabel.text = "\(playerScore)"
+        playerScoreLabel.horizontalAlignmentMode = .center
+        playerScoreLabel.verticalAlignmentMode = .center
+        playerScoreLabel.fontName = "Arial"
+        playerScoreLabel.fontSize = 25
+        playerNode.addChild(playerScoreLabel)
+        
+        AINode.position = CGPoint(x: 127.5, y: 180)
+        addChild(AINode)
+        
+        AIScoreLabel.text = "\(AIScore)"
+        AIScoreLabel.horizontalAlignmentMode = .center
+        AIScoreLabel.verticalAlignmentMode = .center
+        AIScoreLabel.fontName = "Arial"
+        AIScoreLabel.fontSize = 25
+        AINode.addChild(AIScoreLabel)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -90,7 +107,7 @@ class EndGameAIScene : SKScene {
         
         if newButton.contains(touchLocation!){
             let reveal = SKTransition.doorsOpenHorizontal(withDuration: 0.5)
-            let gameScene = GameScene(size: self.size, newGame: true)
+            let gameScene = MenuScene(size: size)
             view?.presentScene(gameScene, transition: reveal)
             
         }

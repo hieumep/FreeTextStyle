@@ -403,6 +403,80 @@ class BoardGame : NSObject{
         }
     }
     
+    func processAIEasy() -> moveDirection? {
+        var arrayDirection = [moveDirection]()
+        var direction : moveDirection? = nil
+        let copyBoard = BoardGame()
+        var maxScore = 0
+        
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        //letf
+        let (arrayleft , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
+        if !arrayleft.isEmpty {
+            if direction == nil {
+                direction = .left
+            }
+            if scoreLeft > maxScore {
+                direction = .left
+                maxScore = scoreLeft
+            }else if scoreLeft == maxScore {
+                arrayDirection.append(.left)
+            }
+        }
+        //right
+        
+        let (arrayRight, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
+        if !arrayRight.isEmpty{
+            if direction == nil {
+                direction = .right
+            }
+            if scoreRight > maxScore {
+                direction = .right
+                maxScore = scoreRight
+                arrayDirection.removeAll()
+            }else if scoreRight == maxScore{
+                arrayDirection.append(.right)
+            }
+            
+        }
+        //up
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (arrayUp, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
+        if !arrayUp.isEmpty {
+            if direction == nil {
+                direction = .up
+            }
+            if scoreUp > maxScore {
+                direction = .up
+                maxScore = scoreUp
+                arrayDirection.removeAll()
+            }else if scoreUp == maxScore {
+                arrayDirection.append(.up)
+            }
+        }
+        //down
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
+        let (arrayDown, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
+        if !arrayDown.isEmpty {
+            if direction == nil {
+                direction = .down
+            }
+            if scoreDown > maxScore {
+                direction = .down
+                maxScore = scoreDown
+                arrayDirection.removeAll()
+            } else if scoreDown == maxScore {
+                arrayDirection.append(.down)
+            }
+        }
+        
+        if !arrayDirection.isEmpty {
+            let randomIndex = Int(arc4random_uniform(UInt32(arrayDirection.count - 1)))
+            return arrayDirection[randomIndex]
+        }
+        return direction
+    }
+    
     func processAI() -> moveDirection? {
         var arrayDirection = [moveDirection]()
         var direction : moveDirection? = nil
@@ -414,7 +488,7 @@ class BoardGame : NSObject{
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         //letf
         let (arrayleft , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
-        if !arrayleft.isEmpty {
+        if arrayleft.count > 0 {
             if direction == nil {
                 direction = .left
             }
@@ -428,11 +502,12 @@ class BoardGame : NSObject{
                 arrayDirection.append(.left)
             }
             print("diff Left : \(diffScore)")
+            print("array Left : \(arrayleft.count)")
         }
         //right
         
         let (arrayRight, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
-        if !arrayRight.isEmpty{
+        if arrayRight.count > 0{
             if direction == nil {
                 direction = .right
             }
@@ -447,11 +522,12 @@ class BoardGame : NSObject{
                 arrayDirection.append(.right)
             }
             print("diff right : \(diffScore)")
+            print("arrayRight : \(arrayRight.count)")
         }
         //up
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayUp, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
-        if !arrayUp.isEmpty {
+        if arrayUp.count > 0 {
             if direction == nil {
                 direction = .up
             }
@@ -466,11 +542,12 @@ class BoardGame : NSObject{
                 arrayDirection.append(.up)
             }
             print("diff up : \(diffScore)")
+            print("arrayUp : \(arrayUp.count)")
         }
         //down
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayDown, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
-        if !arrayDown.isEmpty {
+        if arrayDown.count > 0 {
             if direction == nil {
                 direction = .down
             }
@@ -481,10 +558,11 @@ class BoardGame : NSObject{
                 direction = .down
                 maxScore = diffScore
                 arrayDirection.removeAll()
-            } else if scoreDown == diffScore {
+            } else if maxScore == diffScore {
                 arrayDirection.append(.down)
             }
             print("diff down : \(diffScore)")
+            print("arrayDown :\(arrayDown.count)")
         }
         print("------------")
         
