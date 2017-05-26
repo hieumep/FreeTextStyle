@@ -28,6 +28,7 @@ class GameVsAiScene : SKScene {
     var newGame = true
     var boardGame = BoardGame()
     var swipeAbleFlag = true
+    var funAI : Bool
     
     var AIScore = 0 {
         didSet{
@@ -59,9 +60,10 @@ class GameVsAiScene : SKScene {
     var playerBg : SKSpriteNode!
     var AIBg : SKSpriteNode!
     
-    init(size: CGSize, newGame : Bool) {
+    init(size: CGSize, newGame : Bool, funAI : Bool) {
         playerBg = SKSpriteNode(texture: playerTextureBg)
         AIBg = SKSpriteNode(texture: AITextureBg)
+        self.funAI = funAI
         super.init(size: size)
         self.newGame = newGame
     }
@@ -276,18 +278,41 @@ class GameVsAiScene : SKScene {
             } else {
                 print("Continue game")
                 if !self.playerFlag {
-                    if let AIDirection = self.boardGame.processAI(){
-                        let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
-                        if !AIarray.isEmpty{
-                            self.animateMoveNode(array: AIarray, score: AIscore)
-                        }else {
-                            print("khong co nuoc di")
-                        }
-                    } else {
-                        print("no move")
+                    if self.funAI {
+                        self.processFunAI()
+                    }else {
+                        self.processStriclyAI()
                     }
                 }
             }
+        }
+    }
+    
+    // process fun AI 
+    func processFunAI(){
+        if let AIDirection = self.boardGame.processAIEasy(){
+            let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
+            if !AIarray.isEmpty{
+                self.animateMoveNode(array: AIarray, score: AIscore)
+            }else {
+                print("khong co nuoc di")
+            }
+        } else {
+            print("no move")
+        }
+    }
+    
+    // process stricly AI
+    func processStriclyAI(){
+        if let AIDirection = self.boardGame.processAI(){
+            let (AIarray, AIscore) = self.boardGame.swipeBoard(moveDirection: AIDirection)
+            if !AIarray.isEmpty{
+                self.animateMoveNode(array: AIarray, score: AIscore)
+            }else {
+                print("khong co nuoc di")
+            }
+        } else {
+            print("no move")
         }
     }
     
@@ -436,44 +461,5 @@ class GameVsAiScene : SKScene {
         node.run(SKAction.sequence([scaleBigger,scaleSmaller]))
     }
     
-    func processAI() -> moveDirection {
-        var direction = moveDirection.left
-        let copyBoard = BoardGame()
-        var maxScore = 0
-        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
-        let (_ , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
-        if scoreLeft >= maxScore {
-            direction = .left
-            maxScore = scoreLeft
-        }
-        let (_, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
-        if scoreRight >= maxScore {
-            direction = .right
-            maxScore = scoreRight
-        }
-        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
-        let (_, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
-        if scoreUp >= maxScore {
-            direction = .up
-            maxScore = scoreUp
-        }
-        copyArray(array: boardGame.gameArray, arrayCopy: copyBoard.gameArray)
-        let (_, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
-        if scoreDown >= maxScore {
-            direction = .down
-            maxScore = scoreDown
-        }
-        return direction
-
-    }
-    
-    // Ham dung de copy value cua mang
-    func copyArray(array : Array2D<NumberNode>, arrayCopy : Array2D<NumberNode>){
-        for column in 0 ..< array.columns {
-            for row in 0 ..< array.rows {
-                arrayCopy[column,row]?.number = (array[column, row]?.number)!
-            }
-        }
-    }
 }
 

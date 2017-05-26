@@ -67,8 +67,9 @@ class MenuScene : SKScene {
         
         if let gameVsAIButton = gameVsAIButton {
             if gameVsAIButton.contains(touchLocation!) {
-                let gameVsAiScene = GameVsAiScene(size: self.size, newGame: true)
-                view?.presentScene(gameVsAiScene, transition: reveal)
+                let revealAI = SKTransition.doorsCloseVertical(withDuration: 0.5)
+                let menuAIScene = MenuAIScene(size: size)
+                view?.presentScene(menuAIScene, transition: revealAI)
             }
         }
     }

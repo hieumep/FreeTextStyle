@@ -131,7 +131,7 @@ class BoardGame : NSObject{
         while !flag {
             let column = Int(arc4random_uniform(4) % 4)
             let row = Int(arc4random_uniform(4) % 4)
-            print ("Column :\(column) && Row :\(row)")
+          //  print ("Column :\(column) && Row :\(row)")
             let node = gameArray[column,row]
             if node?.number == 0 {
                // numNode = NumberNode(column: column, row: row, number: 2).
@@ -412,7 +412,7 @@ class BoardGame : NSObject{
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         //letf
         let (arrayleft , scoreLeft) = copyBoard.swipeBoard(moveDirection: .left)
-        if !arrayleft.isEmpty {
+        if arrayleft.count > 0 {
             if direction == nil {
                 direction = .left
             }
@@ -424,9 +424,9 @@ class BoardGame : NSObject{
             }
         }
         //right
-        
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayRight, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
-        if !arrayRight.isEmpty{
+        if arrayRight.count > 0{
             if direction == nil {
                 direction = .right
             }
@@ -442,7 +442,7 @@ class BoardGame : NSObject{
         //up
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayUp, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
-        if !arrayUp.isEmpty {
+        if arrayUp.count > 0{
             if direction == nil {
                 direction = .up
             }
@@ -457,7 +457,7 @@ class BoardGame : NSObject{
         //down
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayDown, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
-        if !arrayDown.isEmpty {
+        if arrayDown.count > 0 {
             if direction == nil {
                 direction = .down
             }
@@ -506,6 +506,7 @@ class BoardGame : NSObject{
         }
         //right
         
+        copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayRight, scoreRight) = copyBoard.swipeBoard(moveDirection: .right)
         if arrayRight.count > 0{
             if direction == nil {
@@ -524,6 +525,7 @@ class BoardGame : NSObject{
             print("diff right : \(diffScore)")
             print("arrayRight : \(arrayRight.count)")
         }
+        
         //up
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayUp, scoreUp) = copyBoard.swipeBoard(moveDirection: .up)
@@ -544,6 +546,7 @@ class BoardGame : NSObject{
             print("diff up : \(diffScore)")
             print("arrayUp : \(arrayUp.count)")
         }
+        
         //down
         copyArray(array: gameArray, arrayCopy: copyBoard.gameArray)
         let (arrayDown, scoreDown) = copyBoard.swipeBoard(moveDirection: .down)
